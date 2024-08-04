@@ -1,0 +1,95 @@
+services:
+    app:
+        image: kevinduy/php
+        restart: always
+        tty: true
+        volumes:
+            - ./ws-app/:/var/www/app
+        working_dir: /var/www/app
+        ports:
+            - "5173:5173"
+            - "8000:8000"
+        links:
+            - db
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+
+    nginx:
+        image: kevinduy/nginx
+        restart: always
+        tty: true
+        volumes:
+            - ./ws-app:/var/www/app
+            - ./docker/nginx/conf.d:/etc/nginx/conf.d
+            - ./docker/nginx/install:/install
+        ports:
+            - "80:80"
+        command: /bin/bash -c "nginx"
+
+    db:
+        image: mysql:8
+        restart: always
+        volumes:
+            - ./.docker/db/mysql:/var/lib/mysql
+            - ./.docker/db/data:/var/data
+            - ./docker/mysql/conf.d/db.cnf:/etc/mysql/conf.d/db.cnf
+        working_dir: /var/data
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: laravel
+            MYSQL_ROOT_PASSWORD: root
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - "8080:80"
+        depends_on:
+            - db
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            PMA_USER: root
+            PMA_PASSWORD: root
+            PMA_USER_CONFIG_BASE64: PD9waHAKJGNmZ1snTG9naW5Db29raWVWYWxpZGl0eSddID0gODY0MDA7
+        volumes:
+            - ./docker/phpmyadmin/sessions:/sessions
+
+    wsnode:
+        image: node:20
+        tty: true
+        restart: always
+        volumes:
+            - ./ws-node:/var/app
+        working_dir: /var/app
+        ports:
+            - "3000:3000"
+            - "4000:4000"
+        links:
+            - db
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+
+    wspython:
+        image: python:3
+        tty: true
+        restart: always
+        volumes:
+            - ./ws-py:/var/app
+        working_dir: /var/app
+        ports:
+            - "3001:3001"
+        links:
+            - db
+
+    wsgo:
+        image: golang:1.21
+        tty: true
+        restart: always
+        volumes:
+            - ./ws-go:/var/app
+        working_dir: /var/app
+        ports:
+            - "3002:3002"
+        links:
+            - db

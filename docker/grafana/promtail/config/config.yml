@@ -1,0 +1,45 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*log
+
+- job_name: my-app
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: registration-app-id
+      __path__: /var/log/performance-*.log
+  pipeline_stages:
+    - json:
+        expressions:
+          metrics: message
+          status: level
+          channel: channel
+          timestamp: datetime
+          path: context.path
+          value: context.value
+          category: context.category
+          start_at: context.start_at
+          end_at: context.end_at
+    - metrics:
+        execution_time:
+          type: Histogram
+          description: "Execution time duration"
+          source: value
+          config:
+            buckets: [0.001,0.0025,0.005,0.010,0.025,0.050]
