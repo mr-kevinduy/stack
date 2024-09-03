@@ -11,6 +11,10 @@ services:
             - "8000:8000"
         links:
             - db
+            - redis
+        depends_on:
+            - db
+            - redis
         environment:
             - CHOKIDAR_USEPOLLING=true
 
@@ -40,6 +44,15 @@ services:
             MYSQL_DATABASE: laravel
             MYSQL_ROOT_PASSWORD: root
 
+    redis:
+        image: redis
+        restart: always
+        ports:
+            - "6379:6379"
+        volumes: 
+            - ./.docker/redis/cache:/data
+        command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -53,7 +66,7 @@ services:
             PMA_PASSWORD: root
             PMA_USER_CONFIG_BASE64: PD9waHAKJGNmZ1snTG9naW5Db29raWVWYWxpZGl0eSddID0gODY0MDA7
         volumes:
-            - ./docker/phpmyadmin/sessions:/sessions
+            - ./.docker/phpmyadmin/sessions:/sessions
 
     wsnode:
         image: node:20

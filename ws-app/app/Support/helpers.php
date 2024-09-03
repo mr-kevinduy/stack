@@ -28,10 +28,17 @@ if (! function_exists('admin_url')) {
     }
 }
 
+if (! function_exists('admin_home_route_name')) {
+    function admin_home_route_name()
+    {
+        return admin_as().'.'.admin_home_suffix();
+    }
+}
+
 if (! function_exists('admin_home_url')) {
     function admin_home_url()
     {
-        return route(admin_as().'.'.admin_home_suffix());
+        return route(admin_home_route_name());
     }
 }
 

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'debug' => true,
     'admin' => [
         'as' => 'admin',
         'prefix' => 'cpanel',
