@@ -1,0 +1,79 @@
+<?php
+
+return [
+    // Error messages.
+    'ERR_400' => '400 Bad Request.',
+    'ERR_401' => '401 Unauthorized.',
+    'ERR_403' => '403 Forbidden.',
+    'ERR_404' => '404 Not found.',
+    'ERR_419' => 'The page expired, please try again.',
+    'ERR_422' => 'The given data was invalid.',
+    'ERR_500' => '500 Internal Server error.',
+    'ERR_502' => '502 Bad gateway.',
+    'ERR_503' => '503 Service unavailable.',
+    'ERR_504' => '504 Gateway timeout.',
+
+    // Response Status Texts
+    'STATUS_TEXT_100' => 'Continue',
+    'STATUS_TEXT_101' => 'Switching Protocols',
+    'STATUS_TEXT_102' => 'Processing',            // RFC2518
+    'STATUS_TEXT_103' => 'Early Hints',
+    'STATUS_TEXT_200' => 'OK',
+    'STATUS_TEXT_201' => 'Created',
+    'STATUS_TEXT_202' => 'Accepted',
+    'STATUS_TEXT_203' => 'Non-Authoritative Information',
+    'STATUS_TEXT_204' => 'No Content',
+    'STATUS_TEXT_205' => 'Reset Content',
+    'STATUS_TEXT_206' => 'Partial Content',
+    'STATUS_TEXT_207' => 'Multi-Status',          // RFC4918
+    'STATUS_TEXT_208' => 'Already Reported',      // RFC5842
+    'STATUS_TEXT_226' => 'IM Used',               // RFC3229
+    'STATUS_TEXT_300' => 'Multiple Choices',
+    'STATUS_TEXT_301' => 'Moved Permanently',
+    'STATUS_TEXT_302' => 'Found',
+    'STATUS_TEXT_303' => 'See Other',
+    'STATUS_TEXT_304' => 'Not Modified',
+    'STATUS_TEXT_305' => 'Use Proxy',
+    'STATUS_TEXT_307' => 'Temporary Redirect',
+    'STATUS_TEXT_308' => 'Permanent Redirect',    // RFC7238
+    'STATUS_TEXT_400' => 'Bad Request',
+    'STATUS_TEXT_401' => 'Unauthorized',
+    'STATUS_TEXT_402' => 'Payment Required',
+    'STATUS_TEXT_403' => 'Forbidden',
+    'STATUS_TEXT_404' => 'Not Found',
+    'STATUS_TEXT_405' => 'Method Not Allowed',
+    'STATUS_TEXT_406' => 'Not Acceptable',
+    'STATUS_TEXT_407' => 'Proxy Authentication Required',
+    'STATUS_TEXT_408' => 'Request Timeout',
+    'STATUS_TEXT_409' => 'Conflict',
+    'STATUS_TEXT_410' => 'Gone',
+    'STATUS_TEXT_411' => 'Length Required',
+    'STATUS_TEXT_412' => 'Precondition Failed',
+    'STATUS_TEXT_413' => 'Content Too Large',                                           // RFC-ietf-httpbis-semantics
+    'STATUS_TEXT_414' => 'URI Too Long',
+    'STATUS_TEXT_415' => 'Unsupported Media Type',
+    'STATUS_TEXT_416' => 'Range Not Satisfiable',
+    'STATUS_TEXT_417' => 'Expectation Failed',
+    'STATUS_TEXT_418' => 'I\'m a teapot',                                               // RFC2324
+    'STATUS_TEXT_421' => 'Misdirected Request',                                         // RFC7540
+    'STATUS_TEXT_422' => 'Unprocessable Content',                                       // RFC-ietf-httpbis-semantics
+    'STATUS_TEXT_423' => 'Locked',                                                      // RFC4918
+    'STATUS_TEXT_424' => 'Failed Dependency',                                           // RFC4918
+    'STATUS_TEXT_425' => 'Too Early',                                                   // RFC-ietf-httpbis-replay-04
+    'STATUS_TEXT_426' => 'Upgrade Required',                                            // RFC2817
+    'STATUS_TEXT_428' => 'Precondition Required',                                       // RFC6585
+    'STATUS_TEXT_429' => 'Too Many Requests',                                           // RFC6585
+    'STATUS_TEXT_431' => 'Request Header Fields Too Large',                             // RFC6585
+    'STATUS_TEXT_451' => 'Unavailable For Legal Reasons',                               // RFC7725
+    'STATUS_TEXT_500' => 'Internal Server Error',
+    'STATUS_TEXT_501' => 'Not Implemented',
+    'STATUS_TEXT_502' => 'Bad Gateway',
+    'STATUS_TEXT_503' => 'Service Unavailable',
+    'STATUS_TEXT_504' => 'Gateway Timeout',
+    'STATUS_TEXT_505' => 'HTTP Version Not Supported',
+    'STATUS_TEXT_506' => 'Variant Also Negotiates',                                     // RFC2295
+    'STATUS_TEXT_507' => 'Insufficient Storage',                                        // RFC4918
+    'STATUS_TEXT_508' => 'Loop Detected',                                               // RFC5842
+    'STATUS_TEXT_510' => 'Not Extended',                                                // RFC2774
+    'STATUS_TEXT_511' => 'Network Authentication Required',                             // RFC6585
+];

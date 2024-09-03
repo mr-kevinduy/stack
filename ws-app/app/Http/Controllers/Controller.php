@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
-abstract class Controller
+use Illuminate\Routing\Controller as AbstractController;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+
+abstract class Controller extends AbstractController
 {
+    use AuthorizesRequests, ValidatesRequests;
+
     protected ?string $as;
+
     protected ?string $resource;
 
-    protected function view(?string $path, array $data = [])
+    protected function view(?string $path = null, array $data = [])
     {
         $viewPath = [];
 
@@ -19,6 +26,10 @@ abstract class Controller
             $viewPath[] = $this->resource;
         }
 
-        return view(implode('.', array_merge($viewPath, [$path])), $data);
+        if (! empty($path)) {
+            $viewPath[] = $path;
+        }
+
+        return view(implode('.', $viewPath), $data);
     }
 }
