@@ -7,7 +7,6 @@ services:
             - ./ws-app/:/var/www/app
         working_dir: /var/www/app
         ports:
-            - "5173:5173"
             - "8000:8000"
         links:
             - db
@@ -24,10 +23,12 @@ services:
         tty: true
         volumes:
             - ./ws-app:/var/www/app
+            - ./ws-php:/var/www/ws-php
             - ./docker/nginx/conf.d:/etc/nginx/conf.d
             - ./docker/nginx/install:/install
         ports:
             - "80:80"
+            - "81:81"
         command: /bin/bash -c "nginx"
 
     db:
@@ -68,7 +69,25 @@ services:
         volumes:
             - ./.docker/phpmyadmin/sessions:/sessions
 
-    wsnode:
+    ws-php:
+        image: kevinduy/php
+        restart: always
+        tty: true
+        volumes:
+            - ./ws-php/:/var/www/ws-php
+        working_dir: /var/www/ws-php
+        ports:
+            - "8100:8100"
+        links:
+            - db
+            - redis
+        depends_on:
+            - db
+            - redis
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+
+    ws-node:
         image: node:20
         tty: true
         restart: always
@@ -83,7 +102,7 @@ services:
         environment:
             - CHOKIDAR_USEPOLLING=true
 
-    wspython:
+    ws-python:
         image: python:3
         tty: true
         restart: always
@@ -95,7 +114,7 @@ services:
         links:
             - db
 
-    wsgo:
+    ws-go:
         image: golang:1.21
         tty: true
         restart: always

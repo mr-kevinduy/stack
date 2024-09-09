@@ -49,3 +49,44 @@ if (! function_exists('home_url')) {
     }
 }
 
+if (! function_exists('front_as')) {
+    function front_as()
+    {
+        return config('site.front.as', 'front');
+    }
+}
+
+if (! function_exists('front_prefix')) {
+    function front_prefix()
+    {
+        return config('site.front.prefix', null);
+    }
+}
+
+if (! function_exists('front_home_suffix')) {
+    function front_home_suffix()
+    {
+        return config('site.front.home_suffix', 'home.index');
+    }
+}
+
+if (! function_exists('front_home_route_name')) {
+    function front_home_route_name()
+    {
+        return front_as().'.'.front_home_suffix();
+    }
+}
+
+if (! function_exists('front_home_url')) {
+    function front_home_url()
+    {
+        return route(front_home_route_name());
+    }
+}
+
+if (! function_exists('front_route')) {
+    function front_route($routeName = '', $options = [])
+    {
+        return route(front_as().'.'.$routeName, $options);
+    }
+}

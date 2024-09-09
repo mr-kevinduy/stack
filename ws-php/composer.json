@@ -1,0 +1,21 @@
+{
+    "name": "kevinduy/php",
+    "description": "php pure",
+    "type": "project",
+    "require": {
+        "php": "^8.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Kevinduy\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "KevinDuy",
+            "email": "mr.kevinduy@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
