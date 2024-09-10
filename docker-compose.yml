@@ -5,6 +5,7 @@ services:
         tty: true
         volumes:
             - ./ws-app/:/var/www/app
+            - vendor-volume:/var/www/app/vendor
         working_dir: /var/www/app
         ports:
             - "8000:8000"
@@ -125,3 +126,7 @@ services:
             - "3002:3002"
         links:
             - db
+
+volumes:
+    vendor-volume:
+        driver: local

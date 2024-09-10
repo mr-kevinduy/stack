@@ -90,3 +90,10 @@ if (! function_exists('front_route')) {
         return route(front_as().'.'.$routeName, $options);
     }
 }
+
+if (! function_exists('uniqcode')) {
+    function uniqcode()
+    {
+        return sha1(uniqid(mt_rand(), true));
+    }
+}

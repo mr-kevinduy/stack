@@ -15,7 +15,11 @@ Route::group([
         'as' => 'uploads.',
         'prefix' => 'uploads',
     ], function () {
-        Route::match(['get', 'post'], '/', [UploadController::class, 'index'])->name('index');
+        Route::get('/', [UploadController::class, 'index'])->name('index');
+        Route::post('/upload/{code}', [UploadController::class, 'upload'])->name('upload');
+        Route::match(['get', 'post'], '/index/{code}', [UploadController::class, 'uploadIndex'])->name('upload-index');
+        Route::match(['get', 'post'], '/video/{code}', [UploadController::class, 'uploadVideo'])->name('upload-video');
+        Route::match(['get', 'post'], '/thumbnail/{code}', [UploadController::class, 'uploadThumbnail'])->name('upload-thumbnail');
     });
 });
 
