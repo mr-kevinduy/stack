@@ -1,7 +1,22 @@
 <x-front-layout>
-    <form action="{{ front_route('uploads.index') }}" method="POST">
-        @csrf
+    <x-section>
+        <x-card class="w-full max-w-lg mx-auto">
+            <x-form action="{{ front_route('uploads.upload-index', ['code' => $code]) }}">
+                <div class="mb-4">
+                    <x-form.input
+                        name="title"
+                        label="Title"
+                    />
+                </div>
 
-        <x-button type="submit">Next to Upload Video</x-button>
-    </form>
+                <div class="flex items-center justify-between mt-8">
+                    <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">
+                        Back
+                    </a>
+                    <x-button type="submit">Next to Upload Video</x-button>
+                </div>
+
+            </x-form>
+        </x-card>
+    </x-section>
 </x-front-layout>

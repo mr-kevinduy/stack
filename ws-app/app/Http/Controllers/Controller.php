@@ -16,20 +16,32 @@ abstract class Controller extends AbstractController
 
     protected function view(?string $path = null, array $data = [])
     {
-        $viewPath = [];
+        $viewPath = $this->routeName($path);
+
+        return view($viewPath, $data);
+    }
+
+    protected function routeName(?string $path = null)
+    {
+        $routePath = [];
 
         if (! empty($this->as)) {
-            $viewPath[] = $this->as;
+            $routePath[] = $this->as;
         }
 
         if (! empty($this->resource)) {
-            $viewPath[] = $this->resource;
+            $routePath[] = $this->resource;
         }
 
         if (! empty($path)) {
-            $viewPath[] = $path;
+            $routePath[] = $path;
         }
 
-        return view(implode('.', $viewPath), $data);
+        return implode('.', $routePath);
+    }
+
+    protected function sessionKey(?string $key = 'session')
+    {
+        return ! empty($this->resource) ? $this->resource.'_'.$key : 'uploads_'.$key;
     }
 }
