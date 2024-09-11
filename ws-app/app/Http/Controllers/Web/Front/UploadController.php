@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Web\Front;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class UploadController extends FrontController
 {
@@ -17,7 +19,7 @@ class UploadController extends FrontController
         return redirect()->route($this->routeName('upload-index'), $compact);
     }
 
-    public function uploadIndex(Request $request, string $code)
+    public function uploadIndexCreate(Request $request, string $code)
     {
         $request->session()->forget([
             $this->sessionKey($code.'_upload_video'),
@@ -26,80 +28,36 @@ class UploadController extends FrontController
 
         $compact = [];
 
-        $params = $request->except(['_token']);
-
         $compact['code'] = $code;
-
-        if ($request->isMethod('post')) {
-            $metadata = array_merge($params, $compact);
-
-            $request->session()->put($this->sessionKey($code.'_upload_index'), $metadata);
-
-            return redirect()->route($this->routeName('upload-video'), $compact);
-        }
 
         return $this->view('index', $compact);
     }
 
-    public function uploadVideo(Request $request, string $code)
+    public function uploadIndexStore(Request $request, string $code)
     {
         $compact = [];
 
-        $params = $request->all();
+        $params = $request->except(['_token']);
 
         $compact['code'] = $code;
 
-        // if ($request->isMethod('post')) {
-        //     $sessionData = array_merge($params, $compact);
+        $sessionData = array_merge($params, $compact);
 
-        //     $request->session()->put($this->sessionKey($code.'_upload_video'), $sessionData);
+        $request->session()->put($this->sessionKey($code.'_upload_index'), $sessionData);
 
-        //     return redirect()->route($this->routeName('upload-thumbnail'), $compact);
-        // }
+        return redirect()->route($this->routeName('upload-video'), $compact);
+    }
+
+    public function uploadVideoCreate(Request $request, string $code)
+    {
+        $compact = [];
+
+        $compact['code'] = $code;
 
         return $this->view('upload-video', $compact);
     }
 
-    public function uploadThumbnail(Request $request, string $code)
-    {
-        $compact = [];
-
-        $params = $request->all();
-
-        $compact['code'] = $code;
-
-        if ($request->isMethod('post')) {
-            $sessionData = array_merge($params, $compact);
-
-            $request->session()->put($this->sessionKey($code.'_upload_thumbnail'), $sessionData);
-
-            return redirect()->route($this->routeName('confirm'), $compact);
-        }
-
-        return $this->view('upload-thumbnail', $compact);
-    }
-
-    public function confirm(Request $request, string $code)
-    {
-        $compact = [];
-
-        $compact['code'] = $code;
-
-        $compact['data'] = array_merge(
-            $request->session()->get($this->sessionKey($code.'_upload_index')),
-            $request->session()->get($this->sessionKey($code.'_upload_video')),
-            $request->session()->get($this->sessionKey($code.'_upload_thumbnail'))
-        );
-
-        return $this->view('confirm', $compact);
-    }
-
-    public function store()
-    {
-
-    }
-
-    public function upload(Request $request, string $code)
+    public function uploadVideoStore(Request $request, string $code)
     {
         $compact = [];
 
@@ -122,20 +80,123 @@ class UploadController extends FrontController
 
         $file = current($result['data']);
 
-        $sessionData = [
-            'code' => $code,
+        $sessionData = array_merge($compact, [
             'file' => $file,
-        ];
+        ]);
 
         $request->session()->put($this->sessionKey($code.'_upload_video'), $sessionData);
 
-        // return response()->json([
-        //     'success' => true,
-        //     'code' => $code,
-        //     'file' => $file,
-        // ]);
+        return response()->json([
+            'success' => true,
+            'code' => $code,
+            'file' => $file,
+        ]);
+    }
 
-        return redirect()->route($this->routeName('upload-thumbnail'), $compact);
+    public function uploadVideoDestroy(Request $request, string $code)
+    {
+        $compact = [];
+
+        $compact['code'] = $code;
+
+        return response()->json([
+            'success' => true,
+            'code' => $code,
+        ]);
+    }
+
+    public function uploadThumbnailCreate(Request $request, string $code)
+    {
+        $compact = [];
+
+        $params = $request->all();
+
+        $compact['code'] = $code;
+
+        return $this->view('upload-thumbnail', $compact);
+    }
+
+    public function uploadThumbnailStore(Request $request, string $code)
+    {
+        $compact = [];
+
+        $params = $request->all();
+
+        $compact['code'] = $code;
+
+        $sessionData = array_merge($params, $compact);
+
+        $request->session()->put($this->sessionKey($code.'_upload_thumbnail'), $sessionData);
+
+        return redirect()->route($this->routeName('confirm'), $compact);
+    }
+
+    public function confirm(Request $request, string $code)
+    {
+        $compact = [];
+
+        $compact['code'] = $code;
+
+        $compact['data'] = array_merge(
+            $request->session()->get($this->sessionKey($code.'_upload_index')),
+            $request->session()->get($this->sessionKey($code.'_upload_video')),
+            $request->session()->get($this->sessionKey($code.'_upload_thumbnail'))
+        );
+
+        return $this->view('confirm', $compact);
+    }
+
+    public function store(Request $request, string $code)
+    {
+
+    }
+
+    private function transcodeVideo($filePath)
+    {
+        // Sử dụng cURL hoặc Guzzle để gửi yêu cầu đến Node.js API
+        // Example với Guzzle
+        $client = new \GuzzleHttp\Client();
+        $client->post('http://localhost:3000/transcode', [
+            'json' => ['filePath' => $filePath]
+        ]);
+    }
+
+    public function uploadChunkStore(Request $request, string $code)
+    {
+        $file = $request->file('qqfile');
+        $fileName = $request->input('qqfilename', '');
+        $partIndex = $request->input('qqpartindex', 0);
+        $totalParts = $request->input('qqtotalparts', 1);
+
+        $tempDir = storage_path('app/uploads/' . $fileName);
+        if (! File::exists($tempDir)) {
+            File::makeDirectory($tempDir, 0755, true);
+        }
+
+        // Lưu từng phần của file vào thư mục tạm thời
+        $file->move($tempDir, "part_{$partIndex}");
+
+        // Kiểm tra nếu tất cả các phần đã được tải lên
+        if (count(scandir($tempDir)) - 2 == $totalParts) {
+            $finalPath = storage_path('app/uploads/') . $fileName;
+
+            // Kết hợp các phần thành một file hoàn chỉnh
+            $outFile = fopen($finalPath, 'wb');
+            for ($i = 0; $i < $totalParts; $i++) {
+                $partPath = $tempDir . "/part_{$i}";
+                fwrite($outFile, file_get_contents($partPath));
+                unlink($partPath); // Xóa phần sau khi ghép
+            }
+            fclose($outFile);
+            rmdir($tempDir);
+
+            // Gửi yêu cầu chuyển mã đến Node.js
+            $this->transcodeVideo($finalPath);
+
+            return response()->json(['success' => true], 200);
+        }
+
+        return response()->json(['success' => true], 200);
     }
 
     public function uploadFile($name, $path = 'uploads', $newName = '', $allowExtension = [], $childPath = true)

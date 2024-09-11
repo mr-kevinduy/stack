@@ -71,19 +71,48 @@
     <script>
         $('#fine-uploader-manual-trigger').fineUploader({
             template: 'qq-template-manual-trigger',
-            request: {
-                customHeaders: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                endpoint: "{{ front_route('uploads.upload', ['code' => $code]) }}"
-            },
             thumbnails: {
                 placeholders: {
                     waitingPath: '/libs/fine-uploader/placeholders/waiting-generic.png',
                     notAvailablePath: '/libs/fine-uploader/placeholders/not_available-generic.png'
                 }
             },
-            autoUpload: false
+            autoUpload: false,
+            request: {
+                endpoint: "{{ front_route('uploads.upload-video.store', ['code' => $code]) }}",
+                customHeaders: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    // 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            },
+            deleteFile: {
+                enabled: true,
+                endpoint: "{{ front_route('uploads.upload-video.destroy', ['code' => $code]) }}"
+            },
+            chunking: {
+                enabled: true,
+                partSize: 1024 * 1024 // 1 MB
+                concurrent: {
+                    enabled: true
+                },
+                success: {
+                    // endpoint: "/vendor/fineuploader/php-traditional-server/endpoint.php?done"
+                }
+            },
+            resume: {
+                enabled: true
+            },
+            retry: {
+                enableAuto: true,
+                showButton: true
+            },
+            callbacks: {
+                onComplete: function(id, name, response) {
+                    if (response.success) {
+                        window.location.href = "{{ front_route('uploads.upload-thumbnail.create', ['code' => $code]) }}";
+                    }
+                }
+            }
         });
 
         $('#trigger-upload').click(function() {
@@ -96,7 +125,7 @@
     <x-section>
         <x-card class="w-full max-w-lg mx-auto">
             <div id="fine-uploader-manual-trigger"></div>
-            {{-- <x-form action="{{ front_route('uploads.upload-video', ['code' => $code]) }}" enctype="multipart/form-data">
+            {{-- <x-form action="{{ front_route('uploads.upload-video.store', ['code' => $code]) }}" enctype="multipart/form-data">
                 <div class="mb-4">
                     <x-form.input
                         name="title"
