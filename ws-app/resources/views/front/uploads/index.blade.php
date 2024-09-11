@@ -1,4 +1,4 @@
-<x-front-layout>
+<x-layout-front>
     <x-section>
         <x-card class="w-full max-w-lg mx-auto">
             <x-form action="{{ front_route('uploads.upload-index.store', ['code' => $code]) }}">
@@ -19,4 +19,4 @@
             </x-form>
         </x-card>
     </x-section>
-</x-front-layout>
+</x-layout-front>

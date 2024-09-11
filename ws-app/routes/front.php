@@ -26,6 +26,7 @@ Route::group([
 
         Route::get('/thumbnail/{code}', [UploadController::class, 'uploadThumbnailCreate'])->name('upload-thumbnail.create');
         Route::post('/thumbnail/{code}', [UploadController::class, 'uploadThumbnailStore'])->name('upload-thumbnail.store');
+        Route::post('/thumbnail/{code}/delete', [UploadController::class, 'uploadThumbnailDestroy'])->name('upload-thumbnail.destroy');
 
         Route::get('/confirm/{code}', [UploadController::class, 'confirm'])->name('confirm');
         Route::post('/store/{code}', [UploadController::class, 'store'])->name('store');

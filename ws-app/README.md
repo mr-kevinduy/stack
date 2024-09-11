@@ -91,3 +91,8 @@ Thực hiện sau khi hầu như những yêu cầu của khách hàng được 
         Note
 
 
+# Frontend
+
+- Tailwindcss: https://tailwindcss.com/docs/object-position
+- Tailwindcss with alpinejs: https://www.penguinui.com/components/tabs
+
