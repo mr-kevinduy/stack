@@ -16,10 +16,19 @@ Route::group([
         'prefix' => 'uploads',
     ], function () {
         Route::get('/', [UploadController::class, 'index'])->name('index');
-        Route::post('/upload/{code}', [UploadController::class, 'upload'])->name('upload');
-        Route::match(['get', 'post'], '/index/{code}', [UploadController::class, 'uploadIndex'])->name('upload-index');
-        Route::match(['get', 'post'], '/video/{code}', [UploadController::class, 'uploadVideo'])->name('upload-video');
-        Route::match(['get', 'post'], '/thumbnail/{code}', [UploadController::class, 'uploadThumbnail'])->name('upload-thumbnail');
+
+        Route::get('/index/{code}', [UploadController::class, 'uploadIndexCreate'])->name('upload-index.create');
+        Route::post('/index/{code}', [UploadController::class, 'uploadIndexStore'])->name('upload-index.store');
+
+        Route::get('/video/{code}', [UploadController::class, 'uploadVideoCreate'])->name('upload-video.create');
+        Route::post('/video/{code}', [UploadController::class, 'uploadVideoStore'])->name('upload-video.store');
+        Route::post('/video/{code}/delete', [UploadController::class, 'uploadVideoDestroy'])->name('upload-video.destroy');
+
+        Route::get('/thumbnail/{code}', [UploadController::class, 'uploadThumbnailCreate'])->name('upload-thumbnail.create');
+        Route::post('/thumbnail/{code}', [UploadController::class, 'uploadThumbnailStore'])->name('upload-thumbnail.store');
+
+        Route::get('/confirm/{code}', [UploadController::class, 'confirm'])->name('confirm');
+        Route::post('/store/{code}', [UploadController::class, 'store'])->name('store');
     });
 });
 

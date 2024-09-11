@@ -1,7 +1,7 @@
 <x-front-layout>
     <x-section>
         <x-card class="w-full max-w-lg mx-auto">
-            <x-form action="{{ front_route('uploads.upload-index', ['code' => $code]) }}">
+            <x-form action="{{ front_route('uploads.upload-index.store', ['code' => $code]) }}">
                 <div class="mb-4">
                     <x-form.input
                         name="title"

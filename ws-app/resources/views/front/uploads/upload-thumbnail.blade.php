@@ -1,4 +1,4 @@
-<form action="{{ front_route('uploads.upload-thumbnail', ['code' => $code]) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ front_route('uploads.upload-thumbnail.store', ['code' => $code]) }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     <button type="submit">Next to Confirm</button>
