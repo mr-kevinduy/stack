@@ -16,7 +16,7 @@ class UploadController extends FrontController
 
         $compact['code'] = uniqcode();
 
-        return redirect()->route($this->routeName('upload-index'), $compact);
+        return redirect()->route($this->routeName('upload-index.create'), $compact);
     }
 
     public function uploadIndexCreate(Request $request, string $code)
@@ -45,7 +45,7 @@ class UploadController extends FrontController
 
         $request->session()->put($this->sessionKey($code.'_upload_index'), $sessionData);
 
-        return redirect()->route($this->routeName('upload-video'), $compact);
+        return redirect()->route($this->routeName('upload-video.create'), $compact);
     }
 
     public function uploadVideoCreate(Request $request, string $code)
@@ -118,6 +118,8 @@ class UploadController extends FrontController
 
     public function uploadThumbnailStore(Request $request, string $code)
     {
+        dd($request->all());
+
         $compact = [];
 
         $params = $request->all();
@@ -129,6 +131,18 @@ class UploadController extends FrontController
         $request->session()->put($this->sessionKey($code.'_upload_thumbnail'), $sessionData);
 
         return redirect()->route($this->routeName('confirm'), $compact);
+    }
+
+    public function uploadThumbnailDestroy(Request $request, string $code)
+    {
+        $compact = [];
+
+        $compact['code'] = $code;
+
+        return response()->json([
+            'success' => true,
+            'code' => $code,
+        ]);
     }
 
     public function confirm(Request $request, string $code)
