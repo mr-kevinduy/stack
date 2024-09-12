@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Web\Front;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use App\Support\UploadHelper;
 
 class UploadController extends FrontController
 {
@@ -63,22 +63,28 @@ class UploadController extends FrontController
 
         $compact['code'] = $code;
 
-        $path = $request->input('path', '');
+        $done = $request->input('done', '');
+        $file = $request->file('qqfile');
+        $fileName = $request->input('qqfilename', '');
+        $partIndex = $request->input('qqpartindex', 0);
+        $totalParts = $request->input('qqtotalparts', 1);
 
-        if (empty($path)) {
-            $path = 'uploads/'.$path;
-        }
+        $uploaded = UploadHelper::upload([
+            'done' => $done,
+            'file' => $file,
+            'fileName' => $fileName,
+            'partIndex' => $partIndex,
+            'totalParts' => $totalParts,
+        ], $code);
 
-        $result = $this->uploadFile('qqfile', $path, $code);
-
-        if ($result['status_code'] !== 200) {
+        if ($uploaded['status_code'] !== 200) {
             return response()->json([
-                'success' => $result['status_code'],
-                'error' => $result['message'],
+                'success' => $uploaded['status_code'],
+                'error' => $uploaded['message'],
             ]);
         }
 
-        $file = current($result['data']);
+        $file = current($uploaded['data']);
 
         $sessionData = array_merge($compact, [
             'file' => $file,
@@ -91,6 +97,44 @@ class UploadController extends FrontController
             'code' => $code,
             'file' => $file,
         ]);
+    }
+
+    public function uploadChunkStore(Request $request, string $code)
+    {
+        $file = $request->file('qqfile');
+        $fileName = $request->input('qqfilename', '');
+        $partIndex = $request->input('qqpartindex', 0);
+        $totalParts = $request->input('qqtotalparts', 1);
+
+        $tempDir = storage_path('app/uploads/' . $fileName);
+        if (! File::exists($tempDir)) {
+            File::makeDirectory($tempDir, 0755, true);
+        }
+
+        // Lưu từng phần của file vào thư mục tạm thời
+        $file->move($tempDir, "part_{$partIndex}");
+
+        // Kiểm tra nếu tất cả các phần đã được tải lên
+        if (count(scandir($tempDir)) - 2 == $totalParts) {
+            $finalPath = storage_path('app/uploads/') . $fileName;
+
+            // Kết hợp các phần thành một file hoàn chỉnh
+            $outFile = fopen($finalPath, 'wb');
+            for ($i = 0; $i < $totalParts; $i++) {
+                $partPath = $tempDir . "/part_{$i}";
+                fwrite($outFile, file_get_contents($partPath));
+                unlink($partPath); // Xóa phần sau khi ghép
+            }
+            fclose($outFile);
+            rmdir($tempDir);
+
+            // Gửi yêu cầu chuyển mã đến Node.js
+            $this->transcodeVideo($finalPath);
+
+            return response()->json(['success' => true], 200);
+        }
+
+        return response()->json(['success' => true], 200);
     }
 
     public function uploadVideoDestroy(Request $request, string $code)
@@ -173,44 +217,6 @@ class UploadController extends FrontController
         $client->post('http://localhost:3000/transcode', [
             'json' => ['filePath' => $filePath]
         ]);
-    }
-
-    public function uploadChunkStore(Request $request, string $code)
-    {
-        $file = $request->file('qqfile');
-        $fileName = $request->input('qqfilename', '');
-        $partIndex = $request->input('qqpartindex', 0);
-        $totalParts = $request->input('qqtotalparts', 1);
-
-        $tempDir = storage_path('app/uploads/' . $fileName);
-        if (! File::exists($tempDir)) {
-            File::makeDirectory($tempDir, 0755, true);
-        }
-
-        // Lưu từng phần của file vào thư mục tạm thời
-        $file->move($tempDir, "part_{$partIndex}");
-
-        // Kiểm tra nếu tất cả các phần đã được tải lên
-        if (count(scandir($tempDir)) - 2 == $totalParts) {
-            $finalPath = storage_path('app/uploads/') . $fileName;
-
-            // Kết hợp các phần thành một file hoàn chỉnh
-            $outFile = fopen($finalPath, 'wb');
-            for ($i = 0; $i < $totalParts; $i++) {
-                $partPath = $tempDir . "/part_{$i}";
-                fwrite($outFile, file_get_contents($partPath));
-                unlink($partPath); // Xóa phần sau khi ghép
-            }
-            fclose($outFile);
-            rmdir($tempDir);
-
-            // Gửi yêu cầu chuyển mã đến Node.js
-            $this->transcodeVideo($finalPath);
-
-            return response()->json(['success' => true], 200);
-        }
-
-        return response()->json(['success' => true], 200);
     }
 
     public function uploadFile($name, $path = 'uploads', $newName = '', $allowExtension = [], $childPath = true)

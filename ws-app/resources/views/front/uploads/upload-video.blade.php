@@ -104,20 +104,20 @@
                     enabled: true
                 },
                 success: {
-                    // endpoint: "/vendor/fineuploader/php-traditional-server/endpoint.php?done"
+                    endpoint: "{{ front_route('uploads.upload-video.store', ['code' => $code, 'done' => 'true']) }}"
                 }
             },
             resume: {
                 enabled: true
             },
             retry: {
-                enableAuto: true,
+                enableAuto: false,
                 showButton: true
             },
             callbacks: {
                 onComplete: function(id, name, response) {
                     if (response.success) {
-                        window.location.href = "{{ front_route('uploads.upload-thumbnail.create', ['code' => $code]) }}";
+                        // window.location.href = "{{ front_route('uploads.upload-thumbnail.create', ['code' => $code]) }}";
                     }
                 }
             }
