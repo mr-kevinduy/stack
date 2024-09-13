@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Front;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use App\Support\UploadHelper;
 
 class UploadController extends FrontController
@@ -63,18 +64,21 @@ class UploadController extends FrontController
 
         $compact['code'] = $code;
 
-        $done = $request->input('done', '');
         $file = $request->file('qqfile');
         $fileName = $request->input('qqfilename', '');
         $partIndex = $request->input('qqpartindex', 0);
         $totalParts = $request->input('qqtotalparts', 1);
+        $resume = $request->input('qqresume', false);
+        $uuid = $request->input('qquuid');
 
         $uploaded = UploadHelper::upload([
-            'done' => $done,
+            'done' => false,
             'file' => $file,
             'fileName' => $fileName,
             'partIndex' => $partIndex,
             'totalParts' => $totalParts,
+            'resume' => $resume,
+            'uuid' => $uuid,
         ], $code);
 
         if ($uploaded['status_code'] !== 200) {

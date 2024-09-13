@@ -104,7 +104,7 @@
                     enabled: true
                 },
                 success: {
-                    endpoint: "{{ front_route('uploads.upload-video.store', ['code' => $code, 'done' => 'true']) }}"
+                    // endpoint: "{{ front_route('uploads.upload-video.store', ['code' => $code, 'done' => 'true']) }}"
                 }
             },
             resume: {
@@ -118,6 +118,67 @@
                 onComplete: function(id, name, response) {
                     if (response.success) {
                         // window.location.href = "{{ front_route('uploads.upload-thumbnail.create', ['code' => $code]) }}";
+
+                        var requestTimeout = 58000; // 58s
+                        var requestSleep = 5000; // 5s
+                        var requestTotal = 1440; // 1440*5/60 = 120 minutes. = 2 hours
+
+                        //  Ajax check video transcoded.
+                        $.ajax({
+                            url: '/v1/transcode/get',
+                            type: "get",
+                            dataType: 'json',
+                            data: {
+                                'code': {{ $code }}
+                            },
+                            timeout: requestTimeout,
+                            cache: false,
+                            tryCount: 0,
+                            retry: requestTotal,
+                            success: function (transcodeResponse) {
+                                this.tryCount++;
+
+                                if (
+                                    transcodeResponse.status == 1 &&
+                                    transcodeResponse.data != '' &&
+                                    transcodeResponse.data.TranscodeJob.TranscodeJobStatus === 'IN_PROGRESS' &&
+                                    this.tryCount <= this.retry
+                                ) {
+                                    var thisAjax = this;
+                                    setTimeout(function() {
+                                        $.ajax(thisAjax);
+
+                                        return;
+                                    }, requestSleep);
+
+                                    return;
+                                } else if (
+                                    transcodeResponse.status == 1 &&
+                                    transcodeResponse.data != '' &&
+                                    transcodeResponse.data.TranscriptionJob.TranscriptionJobStatus === 'COMPLETED'
+                                ) {
+                                    // window.location.reload();
+                                    window.location.href = "{{ front_route('uploads.upload-thumbnail.create', ['code' => $code]) }}";
+
+                                    return {
+                                        status: 1,
+                                        data: transcodeResponse.data
+                                    };
+                                }
+
+                                return {
+                                    status: 1,
+                                    data: null
+                                };
+                            },
+                            error: function (xhr, status, err) {
+                                return {
+                                    status: 0,
+                                    error: err
+                                };
+                            }
+                        });
+
                     }
                 }
             }

@@ -14,7 +14,7 @@ class UploadHelper
     //         ];
     //     }
     //     $file = request()->file($name);
-    public static function upload($fileInput = [], $newName = '', $path = 'uploads', $allowExtension = [], $childPath = true)
+    public static function upload($fileInput = [], $newName = '', $path = 'uploads', $allowExtension = [], $childPath = false)
     {
         $data = [];
 
@@ -26,27 +26,35 @@ class UploadHelper
             ];
         }
 
-        $path = str_replace('.', '', $path);
-        $path = trim($path, '/');
-        $path = $childPath ? $path.'/'.date('Ymd') : $path;
-        // $uploadDir = public_path($path.'/');
-        $uploadDir = storage_path('app/'.$path.'/');
-
-        if (! File::isDirectory($uploadDir)) {
-            File::makeDirectory($uploadDir, 0755, true);
-        }
-
-        $done = isset($fileInput['done']) && ($fileInput['done'] === 'true') ? true : false;
         $file = $fileInput['file'];
         $fileName = isset($fileInput['fileName']) ? $fileInput['fileName'] : null;
         $partIndex = isset($fileInput['partIndex']) ? $fileInput['partIndex'] : null;
         $totalParts = isset($fileInput['totalParts']) ? $fileInput['totalParts'] : null;
+        $resume = isset($fileInput['resume']) ? $fileInput['resume'] : null;
+        $uuid = isset($fileInput['uuid']) ? $fileInput['uuid'] : null;
+        $done = isset($fileInput['done']) && $fileInput['done'] ? true : false;
 
         if (! $file->isValid()) {
             return [
                 'status_code' => 500,
                 'message' => 'File error.',
             ];
+        }
+
+        // Upload directory.
+        $path = str_replace('.', '', $path);
+        $path = trim($path, '/');
+        $path = $childPath ? $path.'/'.date('Ymd') : $path;
+        // $uploadDir = public_path($path.'/');
+        $uploadDir = storage_path('app/'.$path.'/');
+        Log::info('uploadDir : '.$fileName . ' -part: '.$partIndex.' -path: '.$uploadDir);
+        if (! File::isDirectory($uploadDir)) {
+            File::makeDirectory($uploadDir, 0755, true, true);
+        }
+
+        $outDir = $uploadDir.'videos/';
+        if (! File::isDirectory($outDir)) {
+            File::makeDirectory($outDir, 0755, true, true);
         }
 
         // $fileName = $file->getClientOriginalName();
@@ -65,43 +73,40 @@ class UploadHelper
         }
 
         $newFullName = ! empty($newName) ? $newName.'.'.$extension : uniqcode().'.'.$extension;
-        $outPath = $uploadDir.$newFullName;
+        $outPath = $outDir.$newFullName;
 
         // Handle upload with chunk or not chunk.
         if (! is_null($partIndex) && ! is_null($totalParts)) {
             $tempDir = $uploadDir.'tmp/'.$newName;
-
             if (! File::isDirectory($tempDir)) {
-                Log::info('Not dir : '.$fileName . ' -part: '.$partIndex.' -path: '.$tempDir);
-                // File::makeDirectory($tempDir, 0755, true);
+                File::makeDirectory($tempDir, 0755, true, true);
             }
 
             // Save part of file.
-            $file->move($tempDir, "part_{$partIndex}");
+            $success = $file->move($tempDir, "part_{$partIndex}");
 
             // Check when all part-file was uploaded.
             // if (count(scandir($tempDir)) - 2 == $totalParts) {
-            if ($done) {
+            // if ($done) {
+            if ($success && count(scandir($tempDir)) - 2 == $totalParts) {
                 // Combine to one file.
                 $outFile = fopen($outPath, 'wb');
                 for ($i = 0; $i < $totalParts; $i++) {
                     $partPath = $tempDir . "/part_{$i}";
                     fwrite($outFile, file_get_contents($partPath));
-                    unlink($partPath); // Xóa phần sau khi ghép
-                    Log::info('unlink : '.$tempDir . ' -part: '.$partIndex.' -path: '.$partPath);
-                    // if (File::isDirectory($tempDir) && File::exists($partPath)) {
+
+                    // if (File::exists($partPath)) {
                     //     unlink($partPath); // Delete after merged.
                     // }
                 }
                 fclose($outFile);
-                // rmdir($tempDir);
                 File::deleteDirectory($tempDir);
 
                 $data[] = [
                     'success'   => true,
-                    'name'      => $fileName,
+                    'original'  => $fileName,
+                    'name'      => $newName,
                     'path'      => $outPath,
-                    'partIndex' => $partIndex,
                 ];
             }
         } else {

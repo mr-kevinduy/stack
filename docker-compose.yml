@@ -70,6 +70,29 @@ services:
         volumes:
             - ./.docker/phpmyadmin/sessions:/sessions
 
+    ws-ffmpeg:
+        build: ./docker/ffmpeg
+        container_name: ffmpeg-service
+        tty: true
+        # restart: always
+        volumes:
+          - ./:/var/app
+          - ./.docker/storage/videos:/var/videos
+          - ./.docker/storage/transcoded:/var/transcoded
+          - ./.docker/storage/log:/var/log
+        working_dir: /var/app
+        # extra_hosts:
+        #   - "github.com:192.30.255.113"
+        #   - "assets-cdn.github.com:151.101.0.133"
+        #   - "avatars2.githubusercontent.com:151.101.64.133"
+        #   - "avatars1.githubusercontent.com:151.101.64.133"
+        #   - "avatars0.githubusercontent.com:151.101.64.133"
+        #   - "collector.githubapp.com:52.73.244.200"
+        #   - "api.github.com:192.30.255.117"
+        #   - "help.github.com:185.199.109.153"
+        #   - "codeload.github.com:192.30.255.120"
+        #   - "gist.github.com:192.30.255.118"
+
     ws-php:
         image: kevinduy/php
         restart: always
