@@ -70,6 +70,32 @@ services:
         volumes:
             - ./.docker/phpmyadmin/sessions:/sessions
 
+<<<<<<< Updated upstream
+=======
+    ws-transcode:
+        build: ./docker/transcode
+        container_name: transcode-service
+        tty: true
+        # restart: always
+        volumes:
+          - ./ws-transcode:/var/app/transcode-service
+          - ./.docker/transcode-service/video-input:/var/storage/video-input
+          - ./.docker/transcode-service/video-output:/var/storage/video-output
+          - ./.docker/transcode-service/log/transcode-service:/var/log/transcode-service
+        working_dir: /var/app/transcode-service
+        # extra_hosts:
+        #   - "github.com:192.30.255.113"
+        #   - "assets-cdn.github.com:151.101.0.133"
+        #   - "avatars2.githubusercontent.com:151.101.64.133"
+        #   - "avatars1.githubusercontent.com:151.101.64.133"
+        #   - "avatars0.githubusercontent.com:151.101.64.133"
+        #   - "collector.githubapp.com:52.73.244.200"
+        #   - "api.github.com:192.30.255.117"
+        #   - "help.github.com:185.199.109.153"
+        #   - "codeload.github.com:192.30.255.120"
+        #   - "gist.github.com:192.30.255.118"
+
+>>>>>>> Stashed changes
     ws-php:
         image: kevinduy/php
         restart: always
