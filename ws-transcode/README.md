@@ -16,11 +16,32 @@ pip freeze > requirements.txt
 # Development
 
 ```sh
+cd /var/app/transcode-service
+python3 -m virtualenv .virtualenv
+. ./.virtualenv/bin/activate
+# python --version
+# pip --version
 pip install -r requirements.txt
+
+# Start Worker
+celery -A tasks worker -E --concurrency=2 --loglevel=INFO
+# Inspect active queues.
+celery -A tasks inspect active_queues
+
+. ./.virtualenv/bin/activate
+# Run publisher.
+cd /var/storage/video-input
+# wget https://github.com/mediaelement/mediaelement-files/raw/master/big_buck_bunny.mp4
+wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
+cp BigBuckBunny.mp4 ./video1.mp4
+cp BigBuckBunny.mp4 ./video2.mp4
+cp BigBuckBunny.mp4 ./video3.mp4
+cp BigBuckBunny.mp4 ./video4.mp4
+
+python transcode-service/main.py
 ```
 
 # Python
-
 
 ```sh
 ####################################

@@ -1,20 +1,27 @@
 from tasks import transcode
+import os
 
 # Add video to Queue.
 # transcode.delay 	: Method add a task to Celery Queue.
 
 videos = [
-	'/var/storage/video-input/video1.mp4',
-	'/var/storage/video-input/video2.mp4',
-	'/var/storage/video-input/video3.mp4',
-	'/var/storage/video-input/video4.mp4',
-	'/var/storage/video-input/video5.mp4',
-	'/var/storage/video-input/video6.mp4',
-	'/var/storage/video-input/video7.mp4',
+	'video1.mp4',
+	'video2.mp4',
+	'video3.mp4',
+	'video4.mp4',
+	'video5.mp4',
+	'video6.mp4',
+	'video7.mp4',
 ]
+
+input_directory = '/var/storage/video-input/'
+output_directory = '/var/storage/video-output/'
 
 # Add videos to Queue.
 for video in videos:
-	transcode.delay(video)
+	input_path = os.path.join(input_directory, video)
+	
+	transcode.delay(input_path, output_directory)
 
-	print(f"Video {video} has been added to Queue.")
+	print(f"Video {input_path} has been added to Queue.")
+

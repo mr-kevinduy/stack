@@ -6,14 +6,19 @@ import os
 # app.task 	: Define a Celery task.
 # retry  	: Config Celery auto try if have been error.
 @app.task(bind=True)
-def transcode(self, input_path):
-	# file_name = request.form['fileName']
-	# input_path = os.path.join(UPLOAD_FOLDER, file_name)
-	output_path = input_path.replace(".mp4", "-transcoded.mp4")
+def transcode(self, input_path, output_directory):
+	if not os.path.exists(output_directory):
+		os.makedirs(output_directory)
 
-	UPLOAD_FOLDER = 'uploads'
-	if not os.path.exists(UPLOAD_FOLDER):
-		os.makedirs(UPLOAD_FOLDER)
+	if not os.path.isfile(input_path):
+		print(f"Not found {input_path}")
+		return {'status': 'FAILED', 'error': 'Not found '+input_path}
+
+	# filename = request.form['fileName']
+	filename = os.path.basename(input_path)
+	file_pathname, file_extension = os.path.splitext(input_path)
+	output_filename = filename.replace(file_extension, "-output" + file_extension)
+	output_path = os.path.join(output_directory, output_filename)
 
 	try:
 		# Transcode video in here

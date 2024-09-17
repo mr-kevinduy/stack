@@ -26,6 +26,7 @@ RUN cp -R /usr/local/ffmpeg_build/bin/ffmpeg /usr/bin
 
 # Install basic packages
 RUN /root/ffmpeg/setup/install.sh
+RUN /root/ffmpeg/setup/develop.sh
 #RUN /root/ffmpeg/setup/ftp.sh
 
 # Build ffmpeg.

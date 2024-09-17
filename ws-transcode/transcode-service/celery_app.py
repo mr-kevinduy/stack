@@ -1,7 +1,7 @@
 from celery import Celery
 
 # Make a Celery application with Redis backend
-app = Celery('video_transcoder', broker='redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@redis:6379/0')
+app = Celery('transcode_queue', broker='redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@redis:6379/0')
 
 # Limit concurent tasks.
 app.conf.task_annotations = {'*': {'rate_limit': '5/s'}}

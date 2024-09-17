@@ -70,8 +70,6 @@ services:
         volumes:
             - ./.docker/phpmyadmin/sessions:/sessions
 
-<<<<<<< Updated upstream
-=======
     ws-transcode:
         build: ./docker/transcode
         container_name: transcode-service
@@ -95,7 +93,6 @@ services:
         #   - "codeload.github.com:192.30.255.120"
         #   - "gist.github.com:192.30.255.118"
 
->>>>>>> Stashed changes
     ws-php:
         image: kevinduy/php
         restart: always
