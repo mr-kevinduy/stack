@@ -55,6 +55,19 @@ services:
             - ./.docker/redis/cache:/data
         command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
 
+    minio:
+        image: minio/minio
+        container_name: minio
+        volumes:
+            - ./.docker/storage:/mnt/storage
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        environment:
+            MINIO_ROOT_USER: minio
+            MINIO_ROOT_PASSWORD: password
+        command: server --console-address ":9001" /mnt/storage
+
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -69,29 +82,6 @@ services:
             PMA_USER_CONFIG_BASE64: PD9waHAKJGNmZ1snTG9naW5Db29raWVWYWxpZGl0eSddID0gODY0MDA7
         volumes:
             - ./.docker/phpmyadmin/sessions:/sessions
-
-    ws-transcode:
-        build: ./docker/transcode
-        container_name: transcode-service
-        tty: true
-        # restart: always
-        volumes:
-          - ./ws-transcode:/var/app/transcode-service
-          - ./.docker/transcode-service/video-input:/var/storage/video-input
-          - ./.docker/transcode-service/video-output:/var/storage/video-output
-          - ./.docker/transcode-service/log/transcode-service:/var/log/transcode-service
-        working_dir: /var/app/transcode-service
-        # extra_hosts:
-        #   - "github.com:192.30.255.113"
-        #   - "assets-cdn.github.com:151.101.0.133"
-        #   - "avatars2.githubusercontent.com:151.101.64.133"
-        #   - "avatars1.githubusercontent.com:151.101.64.133"
-        #   - "avatars0.githubusercontent.com:151.101.64.133"
-        #   - "collector.githubapp.com:52.73.244.200"
-        #   - "api.github.com:192.30.255.117"
-        #   - "help.github.com:185.199.109.153"
-        #   - "codeload.github.com:192.30.255.120"
-        #   - "gist.github.com:192.30.255.118"
 
     ws-php:
         image: kevinduy/php
@@ -149,6 +139,31 @@ services:
             - "3002:3002"
         links:
             - db
+
+    transcode-service:
+        build: ./docker/transcode-service
+        container_name: transcode-service
+        tty: true
+        # restart: always
+        volumes:
+          - ./transcode-service:/var/app/transcode-service
+          - ./.docker/transcode-service/video-input:/var/storage/video-input
+          - ./.docker/transcode-service/video-output:/var/storage/video-output
+          - ./.docker/transcode-service/log/transcode-service:/var/log/transcode-service
+        working_dir: /var/app/transcode-service
+        ports:
+            - "8001:8001"
+        # extra_hosts:
+        #   - "github.com:192.30.255.113"
+        #   - "assets-cdn.github.com:151.101.0.133"
+        #   - "avatars2.githubusercontent.com:151.101.64.133"
+        #   - "avatars1.githubusercontent.com:151.101.64.133"
+        #   - "avatars0.githubusercontent.com:151.101.64.133"
+        #   - "collector.githubapp.com:52.73.244.200"
+        #   - "api.github.com:192.30.255.117"
+        #   - "help.github.com:185.199.109.153"
+        #   - "codeload.github.com:192.30.255.120"
+        #   - "gist.github.com:192.30.255.118"
 
 volumes:
     vendor-volume:

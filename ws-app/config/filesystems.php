@@ -56,6 +56,17 @@ return [
             'throw' => false,
         ],
 
+        's3-input' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_S3_INPUT_BUCKET'),
+            'url' => env('AWS_S3_INPUT_URL'),
+            'endpoint' => env('AWS_S3_INPUT_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_S3_INPUT_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+        ],
     ],
 
     /*
