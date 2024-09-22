@@ -21,7 +21,8 @@ Route::group([
         Route::post('/index/{code}', [UploadController::class, 'uploadIndexStore'])->name('upload-index.store');
 
         Route::get('/video/{code}', [UploadController::class, 'uploadVideoCreate'])->name('upload-video.create');
-        Route::post('/video/{code}', [UploadController::class, 'uploadVideoStore'])->name('upload-video.store');
+        Route::post('/video/{code}/store', [UploadController::class, 'uploadVideoStore'])->name('upload-video.store');
+        Route::get('/video/{code}/store', [UploadController::class, 'uploadVideoStore'])->name('upload-video.store');
         Route::post('/video/{code}/delete', [UploadController::class, 'uploadVideoDestroy'])->name('upload-video.destroy');
 
         Route::get('/thumbnail/{code}', [UploadController::class, 'uploadThumbnailCreate'])->name('upload-thumbnail.create');
@@ -32,5 +33,3 @@ Route::group([
         Route::post('/store/{code}', [UploadController::class, 'store'])->name('store');
     });
 });
-
-

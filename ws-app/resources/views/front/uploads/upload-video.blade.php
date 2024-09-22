@@ -77,6 +77,87 @@
     </script>
 
     <script>
+        var getTranscodeAjax = function (url, data) {
+            var requestTimeout = 58000; // 58s
+            var requestSleep = 5000; // 5s
+            var requestTotal = 1440; // 1440*5/60 = 120 minutes. = 2 hours
+
+            return $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                data: data,
+                timeout: requestTimeout,
+                cache: false,
+                tryCount: 0,
+                retry: requestTotal,
+                success: function (response) {
+                    this.tryCount++;
+
+                    if (
+                        response.success &&
+                        response.data != '' &&
+                        response.data.job_status === 'IN_PROGRESS' &&
+                        this.tryCount <= this.retry
+                    ) {
+                        var thisAjax = this;
+                        setTimeout(function() {
+                            $.ajax(thisAjax);
+
+                            return;
+                        }, requestSleep);
+
+                        return;
+                    } else if (
+                        response.success &&
+                        response.data != '' &&
+                        response.data.job_status === 'COMPLETED'
+                    ) {
+                        // window.location.reload();
+
+                        return {
+                            success: true,
+                            data: response.data
+                        };
+                    }
+
+                    return {
+                        success: true,
+                        data: null
+                    };
+                },
+                error: function (xhr, status, err) {
+                    return {
+                        success: false,
+                        error: err
+                    };
+                }
+            });
+        };
+
+        var ajaxRequest = function (url, data, method) {
+            var type = method || 'get';
+
+            return $.ajax({
+                url: url,
+                type: type,
+                dataType: 'json',
+                data: data,
+                success: function (response) {
+                    return {
+                        success: true,
+                        data: null
+                    };
+                },
+                error: function (xhr, status, err) {
+                    return {
+                        success: false,
+                        error: err
+                    };
+                }
+            });
+        };
+
         $('#fine-uploader-manual-trigger').fineUploader({
             template: 'qq-template-manual-trigger',
             thumbnails: {
@@ -116,9 +197,52 @@
             },
             callbacks: {
                 onComplete: function(id, name, response) {
-                    if (response.success) {
-                        window.location.href = "{{ front_route('uploads.upload-thumbnail.create', ['code' => $code]) }}";
+                    if (! response.success) {
+                        return {
+                            success: false,
+                            error: 'Not upload complete',
+                        };
                     }
+
+                    if (! response.file && ! ('filename' in response.file)) {
+                        return {
+                            success: false,
+                            error: 'File upload not success.',
+                        };
+                    }
+
+                    var file = response.file;
+                    ajaxRequest('/api/v1/upload/s3', {
+                        'filename': file.fullname,
+                    }, 'post').then(function (uploadResponse) {
+                        if (! uploadResponse.status) {
+                            return {
+                                success: false,
+                                error: 'Upload s3 not success.',
+                            };
+                        }
+
+                        ajaxRequest('/api/v1/transcode/start', {
+                            'data': uploadResponse.payload.data,
+                        }, 'post').then(function (transcodeStartResponse) {
+                            if (! transcodeStartResponse.status) {
+                                return {
+                                    success: false,
+                                    error: 'Transcode start not success.',
+                                };
+                            }
+
+                            getTranscodeAjax().then(function (transcodeGetResponse) {
+                                if (
+                                    transcodeGetResponse.success &&
+                                    transcodeGetResponse.data &&
+                                    transcodeGetResponse.data != ''
+                                ) {
+                                    window.location.href = "{{ front_route('uploads.upload-thumbnail.create', ['code' => $code]) }}";
+                                }
+                            });
+                        });
+                    });
                 }
             }
         });

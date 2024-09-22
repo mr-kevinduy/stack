@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\PostController;
+use App\Http\Controllers\Api\V1\Common\UploadController;
 
 Route::group([
     'as'         => 'v1.',
@@ -22,6 +23,10 @@ Route::group([
             Route::post('register', [RegisterController::class, 'store'])->name('register');
             Route::post('login', [LoginController::class, 'store'])->name('login');
             Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
+        });
+
+        Route::group(['as' => 'upload.', 'prefix' => 'upload'], function () {
+            Route::post('s3', [UploadController::class, 'uploadS3'])->name('s3');
         });
     });
 

@@ -35,4 +35,26 @@ return [
         ],
     ],
 
+    'upload' => [
+        'default' => 'normal',
+    ],
+
+    'transcode' => [
+        'default' => 'aws',
+    ],
+
+    'translation' => [
+        'default' => 'aws',
+        'aws' => [
+            'profile' => env('AWS_TRANSLATE_PROFILE', 'default'),
+            'region' => env('AWS_TRANSLATE_REGION', env('AWS_DEFAULT_REGION', 'us-west-1')),
+            'version' => env('AWS_TRANSLATE_VERSION', '2017-07-01'),
+        ],
+        'google' => [
+
+        ],
+        'deepl' => [
+            'key' => '',
+        ],
+    ],
 ];
