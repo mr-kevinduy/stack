@@ -12,4 +12,9 @@ return [
         'prefix' => null,
         'home_suffix' => 'home.index',
     ],
+    'mypage' => [
+        'as' => 'mypage',
+        'prefix' => 'mypage',
+        'home_suffix' => 'home.index',
+    ],
 ];

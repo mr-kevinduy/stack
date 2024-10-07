@@ -1,3 +1,11 @@
+# Upload Flow
+[WebService]                    [MediaService]
+- Upload to server             
+- Upload to [MediaService]      
+                                Get metadata (duration)
+- Check validate (duration)
+    - Fail                      => 
+
 # Project Management
 
 https://blog.neoscorp.vn/cac-tai-lieu-thiet-ke-phan-mem/

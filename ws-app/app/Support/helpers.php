@@ -91,6 +91,20 @@ if (! function_exists('front_route')) {
     }
 }
 
+if (! function_exists('mypage_as')) {
+    function mypage_as()
+    {
+        return config('site.mypage.as', 'mypage');
+    }
+}
+
+if (! function_exists('mypage_route')) {
+    function mypage_route($routeName = '', $options = [])
+    {
+        return route(mypage_as().'.'.$routeName, $options);
+    }
+}
+
 if (! function_exists('uniqcode')) {
     function uniqcode()
     {
